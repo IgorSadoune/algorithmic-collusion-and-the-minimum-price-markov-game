@@ -1,0 +1,6 @@
+logs/
+plots/
+metrics/
+venv/
+test/
+**/__pycache__/

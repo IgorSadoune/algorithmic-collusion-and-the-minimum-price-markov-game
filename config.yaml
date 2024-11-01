@@ -1,0 +1,37 @@
+#root/config.yaml
+
+common:
+  num_repeats: 1
+  num_episodes: 2
+  num_eval_episodes: 2
+  seed: 42
+  log_interval: 1
+  logs_path: "logs/"
+  metrics_path: "metrics/"
+  plots_path: "plots/"
+  gamma: 0.99
+
+MAPPO:
+  hidden_dims: [128]
+  lr: 0.001
+  clip_param: 0.2
+  c1: 0.5
+  c2: 0.01
+  tau: 0.95
+
+D3QN:
+  hidden_dims: [128]
+  value_stream_hidden_dims: [128]
+  advantage_stream_hidden_dims: [128]
+  lr: 0.001
+  epsilon: 1.0
+  epsilon_decay: 0.995
+  epsilon_min: 0.01
+  buffer_size: 10000
+  batch_size: 1
+
+Epsilon Greedy:
+    epsilon: 0.3
+
+UCB:
+  C: 2  
