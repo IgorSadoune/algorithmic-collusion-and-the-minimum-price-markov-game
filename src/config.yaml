@@ -1,4 +1,4 @@
-#root/config.yaml
+#src/config.yaml
 
 common:
   num_repeats: 1

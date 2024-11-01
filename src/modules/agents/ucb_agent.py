@@ -1,4 +1,4 @@
-#root/modules/agents/ucb_agent.py
+#src/modules/agents/ucb_agent.py
 
 import numpy as np 
 from typing import Dict, Any, List

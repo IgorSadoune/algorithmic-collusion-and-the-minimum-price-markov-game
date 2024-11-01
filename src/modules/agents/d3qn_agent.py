@@ -1,13 +1,16 @@
-#root/modules/agents/d3qn_om_agent.py
+#src/modules/agents/d3qn_agent.py
 
 import torch
-from collections import deque, defaultdict
+from collections import deque
 from typing import List, Dict, Any
 import numpy as np
 import random
 
 
 class DuelingDQN(torch.nn.Module):
+    '''
+    '''
+    
     def __init__(self,
                  state_dim: int,
                  action_dim: int,
@@ -55,33 +58,7 @@ class DuelingDQN(torch.nn.Module):
         return q_values
 
 
-class OpponentModel:
-    def __init__(self, state_dim: int):
-        self.state_dim = state_dim
-        self.model = defaultdict(lambda: [0, 0])  # [count of at least one opponent playing 0, total count]
-
-    def update_opponent_model(self, states: np.ndarray, actions: list) -> None:        
-        state_tuple = tuple(states)
-
-        # Check if at least one opponent plays action 0
-        if 0 in actions:
-            self.model[state_tuple][0] += 1  # Increment count for action 0
-
-        # Increment total count for this state
-        self.model[state_tuple][1] += 1
-
-    def get_opponent_action_frequency(self, state: np.ndarray) -> float:
-        state_tuple = tuple(state)
-        if state_tuple in self.model:
-            action_0_count, total_count = self.model[state_tuple]
-            if total_count > 0:
-                return action_0_count / total_count
-        
-        # If state is unseen, return uniform probability
-        return 0.5
-        
-
-class D3QNOMAgent(OpponentModel):
+class D3QNAgent:
     def __init__(self,
                  agent_id: int,
                  state_dim: int,
@@ -89,8 +66,6 @@ class D3QNOMAgent(OpponentModel):
                  config: Dict[str, Any],
                  device: Any
                  ): 
-
-        super().__init__(state_dim=state_dim)
 
         self.agent_id = agent_id
         self.state_dim = state_dim
@@ -119,16 +94,12 @@ class D3QNOMAgent(OpponentModel):
     def _update_target_network(self):
         self.target_q_network.load_state_dict(self.q_network.state_dict())
 
-    def act(self, states, exploit=False):
+    def act(self, state: np.ndarray, exploit=False) -> bool:
         if not exploit and np.random.rand() <= self.epsilon:
             return np.random.randint(self.action_dim)
-        state_tensor = torch.FloatTensor(states).unsqueeze(0).to(self.device)
+        state_tensor = torch.FloatTensor(state).unsqueeze(0).to(self.device)
         with torch.no_grad():
             q_values = self.q_network(state_tensor)
-        opponent_action_distributions = self.get_opponent_action_frequency(states)  # Shape: [batch_size]
-        # Combine Q-values with opponent model predictions
-        opponent_action_values = torch.tensor(opponent_action_distributions).to(self.device)
-        q_values = q_values * opponent_action_values
         return torch.argmax(q_values).item()
 
     def remember(self, state: np.ndarray, actions: List[bool], rewards: List[float], next_state: np.ndarray, dones: bool):
@@ -144,10 +115,6 @@ class D3QNOMAgent(OpponentModel):
         minibatch = random.sample(self.memory, self.batch_size)
         states, actions_, rewards_, next_states, dones = zip(*minibatch)
         
-        opponent_actions = np.array(actions_)
-        opponent_actions = np.delete(opponent_actions, self.agent_id, axis=1)
-        opponent_actions = torch.LongTensor(opponent_actions).to(self.device)
-
         states = torch.FloatTensor(np.array(states)).to(self.device)
         actions = torch.LongTensor(np.array(actions_)[:, self.agent_id]).to(self.device)
         rewards = torch.FloatTensor(np.array(rewards_)[:, self.agent_id]).to(self.device)
@@ -183,9 +150,6 @@ class D3QNOMAgent(OpponentModel):
         
         # Update epsilon
         self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
-        
-        # Update opponent model 
-        self.update_opponent_model(states, opponent_actions)
 
     def get_metrics(self) -> Dict[str, float]:
         metrics_dict = {"loss": self.loss,

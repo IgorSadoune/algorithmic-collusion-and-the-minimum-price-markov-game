@@ -11,7 +11,7 @@ for %%a in (%AGENTS%) do (
   for %%n in (%NUM_AGENTS%) do (
     for %%s in (%SIGMA_BETA%) do (
       echo Running experiment with agent: %%a, num_agents: %%n, sigma_beta: %%s
-      python main.py --agent_name "%%a" --num_agents %%n --sigma_beta %%s
+      python src\scripts\main.py --agent_name %%a --num_agents %%n --sigma_beta %%s
     )
   )
 )

@@ -1,12 +1,14 @@
-#root/main.py
+#src/scripts/main.py
 
 import yaml 
 import torch 
 import argparse 
-from modules.agents.mappo_agent import MAPPOAgent
+import sys, os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
+
 from modules.trainer import Trainer
 from modules.utils import restricted_float
-
 from modules.agents.mappo_agent import MAPPOAgent
 from modules.agents.d3qn_agent import D3QNAgent
 from modules.agents.d3qn_om_agent import D3QNOMAgent
@@ -21,8 +23,10 @@ parser.add_argument('--sigma_beta', type=restricted_float, default=None, help='S
 parser.add_argument('--agent_name', type=str, default=None, help='Agent name to call the right agents')
 args = parser.parse_args()
 
-# Load config file
-with open("config.yaml", "r") as file:
+# Load the config file
+current_dir = os.path.dirname(os.path.abspath(__file__))
+config_path = os.path.join(current_dir, "../config.yaml")
+with open(config_path, 'r') as file:
     config = yaml.safe_load(file)
 
 # Device

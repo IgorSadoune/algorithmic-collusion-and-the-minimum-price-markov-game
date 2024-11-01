@@ -1,33 +1,53 @@
-# Abstract
+# Table of Contents
+- [Paper Abstract](#abstract)
+- [Project Structure](#project-structure)
+- [Requirements](#requirements)
+- [Installation](#installation)
+  - [Clone the Repository](#clone-the-repository)
+  - [Virtual Environment](#virtual-environment-optional-but-recommended)
+  - [Install the Required Dependencies](#install-the-required-dependencies)
+- [Usage](#usage)
+  - [All Experiments](#all-experiments)
+  - [Computational Considerations (with default hyperparameters)](#computational-considerations-with-default-configuration-of-models-hyperparameters)
+  - [Hyperparameter Configuration](#models-hyperparameter-configuration)
+  - [Specific Experiment](#specific-experiment)
+  - [Experiment Parameter Description](#parameter-description)
+- [Logs and Metrics](#logs-and-metrics)
+- [License](#license)
+- [Author](#author)
+
+# Paper Abstract
 
 This paper introduces the Minimum Price Markov Game (MPMG), a dynamic variant of the Prisoner's Dilemma. The MPMG serves as a theoretical model and reasonable approximation of real-world first-price sealed-bid public auctions that follow the minimum price rule. The goal is to provide researchers and practitioners with a framework to study market fairness and regulation in both digitized and non-digitized public procurement processes, amidst growing concerns about algorithmic collusion in online markets. Using multi-agent reinforcement learning-driven artificial agents, we demonstrate that algorithmic tacit coordination is difficult to achieve in the MPMG when cooperation is not explicitly engineered. Paradoxically, our results highlight the robustness of the minimum price rule in an auction environment, but also show that it is not impervious to full-scale algorithmic collusion. These findings contribute to the ongoing debates about algorithmic pricing and its implications.
+
 
 # Project Structure
 
 ```
-root/
-├── modules/                        # Module directory
-│   ├── agents/                     # MARL agents
-│   │   ├── mappo_agent.py          # Multi-Agent Proximal Policy Optimization
-|   |   ├── d3qn_agent.py           # Double Deep Q-network
-│   │   ├── d3qn_om_agent.py        # Double Deep Q-network with opponent modeling
-|   |   ├── eg_agent.py             # Epsilon Greedy bandit
-|   |   ├── ts_agent.py             # Thompson Sampling bandit
-|   |   └── ucb_agent.py            # Upper Confidence Bound bandit
-│   ├── mpmg.py                     # Minimum Price Markov Game environment
-|   ├── trainer.py                  # General trainer class
-│   └── utils.py                    # Utility methods
-├── logs/                           # Experiments' logs directory
-├── metrics/                        # Training and evaluation metrics
-├── plots/                          # Figures
-├── main.py                         # Experiment control
-├── run_all.sh                      # Run experiments Linux/Mac
-├── run_all.bat                     # Run experiments Windows
-├── config.yaml                     # Configuration file for training hyperparameters
-├── .gitignore                      # Ignore directories and files for Git
-├── requirements.txt                # Dependencies list
-├── README.md                       # Description and usage guide
-└── LICENSE                         # MIT License
+run_all.sh                      # Run experiments script for Linux/Mac
+run_all.bat                     # Run experiments script for Windows
+LICENSE                         # MIT License
+.gitignore                      # Ignore directories and files for Git
+README.md                       # Description and usage guide
+requirements.txt                # Dependencies list
+src/                            # Source directory
+├── config.yaml                 # Configuration file for experiments and models' hyperparameters
+├── logs/                       # Experiments' logs directory
+├── metrics/                    # Training and evaluation metrics
+├── plots/                      # Figures
+├── modules/                    # Module directory
+│   ├── agents/                 # MARL agents
+│   │   ├── mappo_agent.py      # Multi-Agent Proximal Policy Optimization
+│   │   ├── d3qn_agent.py       # Double Deep Q-network
+│   │   ├── d3qn_om_agent.py    # Double Deep Q-network with opponent modeling
+│   │   ├── eg_agent.py         # Epsilon Greedy bandit
+│   │   ├── ts_agent.py         # Thompson Sampling bandit
+│   │   └── ucb_agent.py        # Upper Confidence Bound bandit
+│   ├── mpmg.py                 # Minimum Price Markov Game environment
+│   ├── trainer.py              # General trainer class
+│   └── utils.py                # Utility methods
+└── scripts/                    # Scripts directory
+    └── main.py                 # Experiment control script
 ```
 
 # Requirements
@@ -91,7 +111,7 @@ done < requirements.txt`
 
 # Usage
 
-## All experiments
+## All Experiments
 
 To run all the experiments, for Linux/Mac users, execute in terminal from the root directory:
 
@@ -105,24 +125,29 @@ and for Windows users:
 run_all.bat
 ```
 
-## Specific experiment
+## Computational Considerations (with default hyperparamters) 
+There are a total of 24 experiments as each of the 6 agent classes used in the paper are tested on 4 configurations of the MPMG. Each experiment comprises 100 replications of 100 training episodes and 100 evaluation episodes, for a total of 60,000 training iterations and 60,000 iterations with no parameter update. 
+
+## Hyperparameter Configuration
+Default configuration is stored in `src/config.yaml`, where the file can be accessed and modified. 
+
+## Specific Experiment
 
 To run a specific experiment, for example, MAPPO agents playing the 5-player heterogeneous MPMG, use the following command:
 
 ```sh
-python3 main.py --num_agents 5 --sigma_beta 0.5 --agent_name "mappo"
+python3 src/scripts/main.py --num_agents 5 --sigma_beta 0.5 --agent_name "mappo"
 ```
 
 for Linux/MAC users and 
 
 ```sh
-python main.py --num_agents 5 --sigma_beta 0.5 --agent_name "mappo"
+python src/scripts/main.py --num_agents 5 --sigma_beta 0.5 --agent_name "mappo"
 ```
 
 for Windows users.
 
-### Parameter description
-
+## Experiment Parameter Description
 - **`--num_agents`**: Specifies the number of agents (e.g., `5`). Note that increasing the number of agents may significantly increase computation time.
 - **`--sigma_beta`**: Controls the level of agent heterogeneity, with values ranging between `0` and `0.5`. A higher value implies greater heterogeneity among agents.
 - **`--agent_name`**: Specifies the type of agent to be used. Options include:
@@ -133,8 +158,7 @@ for Windows users.
   - `"ts"`: Thompson Sampling agents
   - `"ucb"`: Upper Confidence Bound agents
 
-## Logs and Metrics
-
+## Logs and metrics
 Upon execution of the experiments, log files will be created in the `logs/` directory for debugging support. The file naming convention follows:
 
 ```

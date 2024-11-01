@@ -1,4 +1,4 @@
-#root/modules/mpmg.py
+#src/modules/mpmg.py
 
 '''
 Minimum Price Markov Game modular environment.

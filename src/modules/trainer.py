@@ -1,4 +1,4 @@
-#root/modules/trainer.py
+#src/modules/trainer.py
 
 import json
 import logging
@@ -42,7 +42,7 @@ class Trainer(MPMGEnv):
 
         # Initialize centralized logging and metrics
         self.metrics_buffer = []
-        self.root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        self.root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
         self.logs_path = os.path.join(self.root, self.logs_path)
         self.metrics_path = os.path.join(self.root, self.metrics_path)
     
