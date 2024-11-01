@@ -63,6 +63,6 @@ class EpsilonGreedyAgent:
     def get_metrics(self) -> Dict[str, float]:
         metrics_dict = {"regret": self.regret,
                         "optimal pulls": self.n_optimal_pulls,
-                        "action value": self.action_value
+                        "action value for cooperation": self.action_value
                         }
         return metrics_dict
