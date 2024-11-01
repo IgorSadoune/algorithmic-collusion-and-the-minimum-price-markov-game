@@ -52,6 +52,6 @@ class UCBAgent:
 
     def get_metrics(self) -> Dict[str, float]:
         metrics_dict = {"regret": self.regret,
-                        "action value": self.action_value
+                        "action value for cooperation": self.action_value
                         }
         return metrics_dict
