@@ -153,6 +153,6 @@ class D3QNAgent:
 
     def get_metrics(self) -> Dict[str, float]:
         metrics_dict = {"loss": self.loss,
-                        "Q value defect": self.q_value_0,
-                        "Q value cooperate": self.q_value_1}
+                        "q-value defect": self.q_value_0,
+                        "q-value cooperate": self.q_value_1}
         return metrics_dict
