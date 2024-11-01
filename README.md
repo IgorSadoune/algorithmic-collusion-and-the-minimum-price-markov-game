@@ -45,7 +45,7 @@ root/
 
 ## Clone the Repository
 
-`git clone https://github.com/IgorSadoune/multi-level-auction-generator.git`
+`git clone https://github.com/IgorSadoune/Algorithmic-Collusion-and-the-Minimum-Price-Markov-Game.git`
 
 ## Virtual Environment (optional but recommended)
 
