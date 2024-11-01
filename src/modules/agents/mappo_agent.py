@@ -138,5 +138,5 @@ class MAPPOAgent:
     def get_metrics(self) -> Dict[str, float]:
         metrics_dict = {"actor loss": self.actor_loss,
                         "critic loss": self.critic_loss,
-                        "policy action 1": self.probs}
+                        "cooperation policy": self.probs}
         return metrics_dict
