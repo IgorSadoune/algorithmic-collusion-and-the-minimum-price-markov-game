@@ -18,6 +18,7 @@ nvidia-nccl-cu12==2.21.5
 nvidia-nvjitlink-cu12==12.4.127
 nvidia-nvtx-cu12==12.4.127
 PyYAML==6.0.2
+scipy==1.14.1
 sympy==1.13.1
 torch==2.5.0
 tqdm==4.66.5
