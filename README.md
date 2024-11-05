@@ -159,19 +159,21 @@ for Windows users.
   - `"ucb"`: Upper Confidence Bound agents
 
 ## Logs and metrics
-Upon execution of the experiments, log files will be created in the `logs/` directory for debugging support. The file naming convention follows:
+If not existing, the `logs/` and `metrics/` directories will be created automatically upon execution of at least one experiment. Each experiment is associated with a `.log` file in the `logs/` directory for debugging support. The file naming convention follows:
 
 ```
 mappo_5_05.log
 ```
 
-where `"mappo"` indicates the agent class, `"5"` represents the number of agents (the value used for `--num_agents`), and `"05"` refers to the value `0.5` for the level of heterogeneity. Similarly, JSON files storing the various training and evaluation metrics will be created under the `metrics/` directory, using a similar naming convention:
+where `"mappo"` indicates the agent class, `"5"` represents the number of agents (the value used for `--num_agents`), and `"05"` refers to the value `0.5` for the level of heterogeneity. 
+
+Similarly, JSON files storing the various training and evaluation metrics will be created upon execution of the experiments under the `metrics/` directory, using a similar naming convention:
 
 ```
 mappo_5_05.json
 ```
 
-If not existing, the `logs/` and `metrics/` directories will be created automatically. If a `.log` or `.json` file already exists before the execution of its associated experiment, it will be replaced if the experiment is executed again. When all experiments are executed at once, all the corresponding `.log` and `.json` files are created.
+If a `.log` or `.json` file already exists before the execution of its associated experiment, it will be replaced if the experiment is executed again. When all experiments are executed at once, all the corresponding `.log` and `.json` files are created.
 
 # License
 

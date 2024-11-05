@@ -4,38 +4,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class HarryPlotter:
-    def __init__(self, data_directory, plot_path):
-        """
-        Initialize the RLMetricPlotter.
-
-        Parameters:
-        - data_directory (str): The path to the directory containing the JSON files with metrics.
-        - plot_path (str): The path to save the plots.
-        """
-        self.data_directory = data_directory
+    def __init__(self, metrics_path: str, plot_path: str):
+        self.metrics_path = metrics_path
         self.plot_path = plot_path
-        self.data = []
-        self.load_data()
 
-    def load_data(self):
-        """
-        Load all JSON files in the data directory.
-        """
-        for file_name in os.listdir(self.data_directory):
-            if file_name.endswith('.json'):
-                with open(os.path.join(self.data_directory, file_name), 'r') as f:
-                    self.data.append(json.load(f))
+        with open(os.path.join(self.data_directory, file_name), 'r') as f:
+            self.data = json.load(f)
 
     def extract_metric(self, metric_name):
-        """
-        Extract a metric across repeats.
-
-        Parameters:
-        - metric_name (str): The name of the metric to extract.
-
-        Returns:
-        - A dictionary with agent-specific metrics averaged across repeats.
-        """
         agent_metrics = {}
         num_repeats = len(self.data)
 
