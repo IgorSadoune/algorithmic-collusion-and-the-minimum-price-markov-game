@@ -18,7 +18,7 @@ class ThompsonSamplingAgent:
 
         self.alpha = np.ones(action_dim)  # Initialize alpha to 1 for each arm
         self.beta = np.ones(self.n_arms)   # Initialize beta to 1 for each arm
-        self.regret = 0
+        self.cumulative_regret = 0.0     
         self.memory = []
 
     def act(self, state=None, exploit: bool=False) -> int:
@@ -42,8 +42,8 @@ class ThompsonSamplingAgent:
         # Regret
         self.alpha[self.chosen_arm] += reward
         self.beta[self.chosen_arm] += 1 - reward
-        self.regret = float(max(self.alpha / (self.alpha + self.beta)) - self.alpha[self.chosen_arm] / (self.alpha[self.chosen_arm] + self.beta[self.chosen_arm]))
+        self.cumulative_regret += float(max(self.alpha / (self.alpha + self.beta)) - self.alpha[self.chosen_arm] / (self.alpha[self.chosen_arm] + self.beta[self.chosen_arm]))
 
     def get_metrics(self) -> Dict[str, float]:
-        metrics_dict = {"regret": self.regret}
+        metrics_dict = {"cumulative_regret": self.cumulative_regret}
         return metrics_dict

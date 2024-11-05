@@ -96,8 +96,8 @@ class Trainer(MPMGEnv):
                 "episode": episode,
                 "actions": actions,
                 "rewards": rewards,
-                "collusive action frequency": action_frequencies,
-                "joint action frequencies": joint_action_frequencies,
+                "collusive_action_frequency": action_frequencies,
+                "joint_action_frequencies": joint_action_frequencies,
                 "metrics": kwargs
             }
 

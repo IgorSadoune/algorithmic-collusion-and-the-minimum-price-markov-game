@@ -136,7 +136,7 @@ class MAPPOAgent:
         self.critic_loss = critic_loss.item()
 
     def get_metrics(self) -> Dict[str, float]:
-        metrics_dict = {"actor loss": self.actor_loss,
-                        "critic loss": self.critic_loss,
-                        "cooperation policy": self.probs}
+        metrics_dict = {"actor_loss": self.actor_loss,
+                        "critic_loss": self.critic_loss,
+                        "cooperation_policy": self.probs}
         return metrics_dict

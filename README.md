@@ -13,6 +13,7 @@
   - [Specific Experiment](#specific-experiment)
   - [Experiment Parameter Description](#parameter-description)
 - [Logs and Metrics](#logs-and-metrics)
+- [Specific Plots](#specific-plots)
 - [License](#license)
 - [Author](#author)
 
@@ -24,17 +25,17 @@ This paper introduces the Minimum Price Markov Game (MPMG), a dynamic variant of
 # Project Structure
 
 ```
-run_all.sh                      # Run experiments script for Linux/Mac
-run_all.bat                     # Run experiments script for Windows
+run_all.sh                      # Run all experiments and plots script for Linux/Mac
+run_all.bat                     # Run all experiments and plots script for Windows
 LICENSE                         # MIT License
 .gitignore                      # Ignore directories and files for Git
 README.md                       # Description and usage guide
 requirements.txt                # Dependencies list
 src/                            # Source directory
 ├── config.yaml                 # Configuration file for experiments and models' hyperparameters
-├── logs/                       # Experiments' logs directory
-├── metrics/                    # Training and evaluation metrics
-├── plots/                      # Figures
+├── logs/                       # Contains experiments' .log files
+├── metrics/                    # Contains training and evaluation metrics JSON files
+├── plots/                      # Contains figures
 ├── modules/                    # Module directory
 │   ├── agents/                 # MARL agents
 │   │   ├── mappo_agent.py      # Multi-Agent Proximal Policy Optimization
@@ -45,8 +46,10 @@ src/                            # Source directory
 │   │   └── ucb_agent.py        # Upper Confidence Bound bandit
 │   ├── mpmg.py                 # Minimum Price Markov Game environment
 │   ├── trainer.py              # General trainer class
+|   ├── plotter.py              # Plotting module
 │   └── utils.py                # Utility methods
 └── scripts/                    # Scripts directory
+    ├── plot.py                 # Plotting control script
     └── main.py                 # Experiment control script
 ```
 
@@ -125,6 +128,8 @@ and for Windows users:
 run_all.bat
 ```
 
+This command will also produce all the figures present in the study. The figures will be saved under the `src/plots/` directory.
+
 ## Computational Considerations (with default hyperparamters) 
 There are a total of 24 experiments as each of the 6 agent classes used in the paper are tested on 4 configurations of the MPMG. Each experiment comprises 100 replications of 100 training episodes and 100 evaluation episodes, for a total of 60,000 training iterations and 60,000 iterations with no parameter update. 
 
@@ -145,7 +150,7 @@ for Linux/MAC users and
 python src/scripts/main.py --num_agents 5 --sigma_beta 0.5 --agent_name "mappo"
 ```
 
-for Windows users.
+for Windows users. 
 
 ## Experiment Parameter Description
 - **`--num_agents`**: Specifies the number of agents (e.g., `5`). Note that increasing the number of agents may significantly increase computation time.
@@ -162,7 +167,7 @@ for Windows users.
 If not existing, the `logs/` and `metrics/` directories will be created automatically upon execution of at least one experiment. Each experiment is associated with a `.log` file in the `logs/` directory for debugging support. The file naming convention follows:
 
 ```
-mappo_5_05.log
+mappo_5_05_log.log
 ```
 
 where `"mappo"` indicates the agent class, `"5"` represents the number of agents (the value used for `--num_agents`), and `"05"` refers to the value `0.5` for the level of heterogeneity. 
@@ -170,10 +175,17 @@ where `"mappo"` indicates the agent class, `"5"` represents the number of agents
 Similarly, JSON files storing the various training and evaluation metrics will be created upon execution of the experiments under the `metrics/` directory, using a similar naming convention:
 
 ```
-mappo_5_05.json
+mappo_5_05_metrics.json
 ```
 
 If a `.log` or `.json` file already exists before the execution of its associated experiment, it will be replaced if the experiment is executed again. When all experiments are executed at once, all the corresponding `.log` and `.json` files are created.
+
+## Specific Plots
+To produce the figures associated to a specific configuration, use for instance
+
+```sh
+python src/scripts/plot.py --file "mappo_5_0.5_metrics.json"
+```
 
 # License
 
