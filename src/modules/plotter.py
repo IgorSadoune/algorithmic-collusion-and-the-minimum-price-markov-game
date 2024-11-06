@@ -3,7 +3,7 @@ import os
 import re
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 class HarryPlotter:
     def __init__(self,
@@ -13,7 +13,7 @@ class HarryPlotter:
                  ):
 
         self.root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
-        self.plot_path = os.path.join(self.root, config['common']['plot_path'])
+        self.plots_path = os.path.join(self.root, config['common']['plots_path'])
         self.metrics_path = metrics_path
         self.mode = mode
 
@@ -23,23 +23,20 @@ class HarryPlotter:
         # Extract dimensions for metrics
         self.num_repeats = len(set(entry['repeat'] for entry in self.data[self.mode]))
         self.num_episodes = len(set(entry['episode'] for entry in self.data[self.mode]))
-        self.num_agents = len(self.data[self.mode][0]['actions']) if 'actions' in self.data[self.mode][0] else 0
-        self.joint_action_size = len(self.data[self.mode][0]['joint action frequencies']) if 'joint action frequencies' in self.data[self.mode][0] else 0
+        self.num_agents = len(self.data[self.mode][0]['actions'])
+        self.joint_action_size = len(self.data[self.mode][0]['joint_action_frequencies'])
 
     def extract_metrics(self):
         metrics = {
             'agent_metrics': {},
-            'cumulative_return': None,
             'joint_action_frequencies': None
         }
 
         # Initialize arrays for storing metrics
         for key in self.data[self.mode][0].keys():
-            if key not in ['repeat', 'episode', 'actions', 'rewards', 'joint action frequencies', 'metrics']:
+            if key not in ['repeat', 'episode', 'actions', 'rewards', 'joint_action_frequencies', 'metrics']:
                 metrics['agent_metrics'][key] = np.zeros((self.num_repeats, self.num_episodes, self.num_agents))
-
         metrics['joint_action_frequencies'] = np.zeros((self.num_repeats, self.num_episodes, self.joint_action_size))
-        metrics['cumulative_return'] = np.zeros((self.num_repeats, self.num_episodes)) if self.mode == 'evaluation' else None
 
         # Fill metrics
         for entry in self.data[self.mode]:
@@ -59,8 +56,6 @@ class HarryPlotter:
                                 metrics['agent_metrics'][metric_key] = np.zeros((self.num_repeats, self.num_episodes, self.num_agents))
                             for agent_idx, agent_value in enumerate(metric_value):
                                 metrics['agent_metrics'][metric_key][repeat, episode, agent_idx] = agent_value
-                        elif metric_key == 'cumulative return':
-                            metrics['cumulative_return'][repeat, episode] = metric_value
 
         return metrics
 
@@ -91,11 +86,11 @@ class HarryPlotter:
         plt.ylabel(ylabel)
 
         # Constructing filename from input JSON
-        base_filename = re.sub(r'(_metrics|\.json)$', '', os.path.basename(self.metrics_path))
+        base_filename = re.sub(r'(_metrics|\.json)', '', os.path.basename(self.metrics_path))
         mode_suffix = "training" if self.mode == 'training' else "evaluation"
-        plot_filename = f'{base_filename}_{mode_suffix}_{metric_name.replace("_", " ")}_plot.png'
+        plot_filename = f'{base_filename}_{mode_suffix}_{metric_name}_plot.png'
         agent_directory = re.match(r'([^_]+)_', plot_filename).group(1)
-        plot_directory = os.path.join(self.plot_path, agent_directory, mode_suffix)
+        plot_directory = os.path.join(self.plots_path, agent_directory, mode_suffix)
 
         # Ensure plot directory exists
         if not os.path.exists(plot_directory):
