@@ -1,20 +1,20 @@
 import json
 import os
+import re
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import Dict, Any, List
 
 class HarryPlotter:
-    def __init__(self, metrics_path: str, plot_path: str, mode: str = 'training'):
-        """
-        Initialize HarryPlotter with the given parameters.
+    def __init__(self,
+                 config: Dict[str, Any],
+                 metrics_path: str,
+                 mode: str = 'training'
+                 ):
 
-        Parameters:
-        - metrics_path (str): The path to the metrics JSON file.
-        - plot_path (str): The path to save the plots.
-        - mode (str): Either 'training' or 'evaluation' to specify which data to plot.
-        """
+        self.root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+        self.plot_path = os.path.join(self.root, config['common']['plot_path'])
         self.metrics_path = metrics_path
-        self.plot_path = plot_path
         self.mode = mode
 
         with open(self.metrics_path, 'r') as f:
@@ -27,12 +27,6 @@ class HarryPlotter:
         self.joint_action_size = len(self.data[self.mode][0]['joint action frequencies']) if 'joint action frequencies' in self.data[self.mode][0] else 0
 
     def extract_metrics(self):
-        """
-        Extract all relevant metrics from the data into numpy arrays for easy processing.
-
-        Returns:
-        - A dictionary with metrics in numpy array format.
-        """
         metrics = {
             'agent_metrics': {},
             'cumulative_return': None,
@@ -71,16 +65,6 @@ class HarryPlotter:
         return metrics
 
     def plot_metric(self, metric_data, metric_name, xlabel='Episodes', ylabel=None):
-        """
-        Plot a specific metric for each agent.
-
-        Parameters:
-        - metric_data (np.array): The metric data to plot.
-        - metric_name (str): The name of the metric to plot.
-        - title (str): The title of the plot.
-        - xlabel (str): The label for the x-axis.
-        - ylabel (str): The label for the y-axis.
-        """
         if ylabel is None:
             ylabel = " ".join(metric_name.split('_')).title()
 
@@ -107,22 +91,20 @@ class HarryPlotter:
         plt.ylabel(ylabel)
 
         # Constructing filename from input JSON
-        base_filename = os.path.basename(self.metrics_path).replace('.json', '').replace('_metrics', '')
+        base_filename = re.sub(r'(_metrics|\.json)$', '', os.path.basename(self.metrics_path))
         mode_suffix = "training" if self.mode == 'training' else "evaluation"
         plot_filename = f'{base_filename}_{mode_suffix}_{metric_name.replace("_", " ")}_plot.png'
+        agent_directory = re.match(r'([^_]+)_', plot_filename).group(1)
+        plot_directory = os.path.join(self.plot_path, agent_directory, mode_suffix)
 
         # Ensure plot directory exists
-        if not os.path.exists(self.plot_path):
-            os.makedirs(self.plot_path)
+        if not os.path.exists(plot_directory):
+            os.makedirs(plot_directory)
 
-        plt.savefig(os.path.join(self.plot_path, plot_filename), dpi=300, bbox_inches='tight')
+        plt.savefig(os.path.join(plot_directory, plot_filename), dpi=300, bbox_inches='tight')
         plt.close()
 
     def plot_all_metrics(self):
-        """
-        Plot all metrics except 'repeat', 'episode', 'actions', and 'rewards'.
-        Plot 'joint action frequencies' and 'action frequencies' for both training and evaluation.
-        """
         metrics = self.extract_metrics()
 
         # Plot agent-specific metrics

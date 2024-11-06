@@ -1,8 +1,15 @@
 #src/scripts/plot.py
 
+import yaml
 import os
 import sys
 import argparse 
+
+# Load the config file
+current_dir = os.path.dirname(os.path.abspath(__file__))
+config_path = os.path.join(current_dir, "../config.yaml")
+with open(config_path, 'r') as file:
+    config = yaml.safe_load(file)
 
 # Add src directory to the system path for module imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
@@ -14,23 +21,18 @@ parser.add_argument('--file', type=str, default='all', help='if "all", will plot
 args = parser.parse_args()
 
 metrics_directory = "src/metrics/"
-plot_directory = "src/plots/"
-
-# Create plot directory if it doesn't exist
-if not os.path.exists(plot_directory):
-    os.makedirs(plot_directory)
 
 if args.file == 'all':
     # Loop over all JSON files in the metrics directory
-    for file_name in os.listdir(metrics_directory):
-        if file_name.endswith('.json'):
-            metrics_path = os.path.join(metrics_directory, file_name)
+    for filename in os.listdir(metrics_directory):
+        if filename.endswith('.json'):
+            metrics_path = os.path.join(metrics_directory, filename)
             for mode in ["training", "evaluation"]:
-                    plotter = HarryPlotter(metrics_path=metrics_path, plot_path=plot_directory, mode=mode)
-                    plotter.plot_all_metrics()
+                plotter = HarryPlotter(config=config, metrics_path=metrics_path, mode=mode)
+                plotter.plot_all_metrics()
 else:
-    file_name = args.file
-    metrics_path = os.path.join(metrics_directory, file_name)
+    filename = args.file
+    metrics_path = os.path.join(metrics_directory, filename)
     for mode in ["training", "evaluation"]:
-                    plotter = HarryPlotter(metrics_path=metrics_path, plot_path=plot_directory, mode=mode)
-                    plotter.plot_all_metrics()
+        plotter = HarryPlotter(config=config, metrics_path=metrics_path, mode=mode)
+        plotter.plot_all_metrics()
