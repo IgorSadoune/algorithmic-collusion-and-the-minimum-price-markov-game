@@ -36,8 +36,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 agent_dict = {
     'mappo': MAPPOAgent,
     'd3qn': D3QNAgent,
-    'd3qn_om': D3QNOMAgent,
-    'e_greedy': EpsilonGreedyAgent,
+    'd3qnom': D3QNOMAgent,
+    'eg': EpsilonGreedyAgent,
     'ts': ThompsonSamplingAgent,
     'ucb': UCBAgent
 }
