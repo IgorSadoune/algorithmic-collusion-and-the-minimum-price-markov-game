@@ -48,10 +48,7 @@ class UCBAgent:
         optimal_reward = max(self.values)
         self.cumulative_regret += float(optimal_reward - reward)
         self.values[self.chosen_arm] = new_value
-        self.action_value = self.values[1]
 
     def get_metrics(self) -> Dict[str, float]:
-        metrics_dict = {"cumulative_regret": self.cumulative_regret,
-                        "action_value_cooperation": self.action_value
-                        }
+        metrics_dict = {"cumulative_regret": self.cumulative_regret}
         return metrics_dict

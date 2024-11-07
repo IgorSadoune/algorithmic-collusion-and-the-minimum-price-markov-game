@@ -46,6 +46,7 @@ class EpsilonGreedyAgent:
 
         reward = np.array(rewards_)[:, self.agent_id]
 
+        # Update
         self.action_counts[self.chosen_arm] += 1
         n = self.action_counts[self.chosen_arm]
         value = self.action_values[self.chosen_arm]
@@ -54,16 +55,7 @@ class EpsilonGreedyAgent:
         # Regret
         optimal_reward = max(self.action_values)
         self.cumulative_regret += float(optimal_reward - reward)
-        
-        if self.chosen_arm == np.argmax(self.action_values):
-            self.n_optimal_pulls += 1
-        self.n_total_pulls += 1
-
-        self.action_value = float(self.action_values[1])
 
     def get_metrics(self) -> Dict[str, float]:
-        metrics_dict = {"cumulative_regret": self.cumulative_regret,
-                        "optimal_pulls": self.n_optimal_pulls,
-                        "action_value_cooperation": self.action_value
-                        }
+        metrics_dict = {"cumulative_regret": self.cumulative_regret}
         return metrics_dict

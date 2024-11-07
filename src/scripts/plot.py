@@ -27,12 +27,10 @@ if args.file == 'all':
     for filename in os.listdir(metrics_directory):
         if filename.endswith('.json'):
             metrics_path = os.path.join(metrics_directory, filename)
-            for mode in ["training", "evaluation"]:
-                plotter = HarryPlotter(config=config, metrics_path=metrics_path, mode=mode)
-                plotter.plot_all_metrics()
+            plotter = HarryPlotter(config=config, metrics_path=metrics_path)
+            plotter.plot_all_metrics()
 else:
     filename = args.file
     metrics_path = os.path.join(metrics_directory, filename)
-    for mode in ["training", "evaluation"]:
-        plotter = HarryPlotter(config=config, metrics_path=metrics_path, mode=mode)
-        plotter.plot_all_metrics()
+    plotter = HarryPlotter(config=config, metrics_path=metrics_path)
+    plotter.plot_all_metrics()
