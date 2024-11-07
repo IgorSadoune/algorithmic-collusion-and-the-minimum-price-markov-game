@@ -30,18 +30,17 @@ class Trainer(MPMGEnv):
         self.agent_class = list(agent.values())[0]
         self.experiment_id = f"{self.num_agents}_{self.sigma_beta}"
         self.agent_ids = [id for id in range(self.num_agents)]
+        self.metrics_buffer = []
 
         # Config
         self.logs_path = config['common']['logs_path']
         self.metrics_path = config['common']['metrics_path']
         self.num_repeats = config['common']['num_repeats']
         self.num_episodes = config['common']['num_episodes']
-        self.num_eval_episodes = config['common']['num_eval_episodes']
-        self.log_interval = config['common']['log_interval']
-        self.config = config 
+        self.seed = config['common']['seed'] 
+        self.config = config
 
         # Initialize centralized logging and metrics
-        self.metrics_buffer = []
         self.root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
         self.logs_path = os.path.join(self.root, self.logs_path)
         self.metrics_path = os.path.join(self.root, self.metrics_path)
@@ -60,8 +59,8 @@ class Trainer(MPMGEnv):
         self.metrics_filename = os.path.join(self.metrics_path, f"{self.agent_name}_{self.experiment_id}_metrics.json")
         
         # Overwrite the metrics file with an empty structure each time
-        with open(self.metrics_filename, mode='w') as file:
-            json.dump({"training": [], "evaluation": []}, file)
+        with open(self.metrics_filename, 'w') as file:
+            json.dump({}, file)
 
     def _set_seed(self, seed):
         torch.manual_seed(seed)
@@ -72,62 +71,35 @@ class Trainer(MPMGEnv):
         self.logger.info(f"Random seed set to {seed}")
 
     def _log_metrics(self,
-                    mode: str,
                     repeat: int,
                     episode: int,
                     actions: List[bool],
                     action_frequencies: List[float],
                     joint_action_frequencies: List[float],
                     rewards: List[float],
-                    **kwargs):
-            """Logs metrics to a JSON file incrementally with buffering.
-            Mode should be 'training' or 'evaluation'.
-            """
+                    cumulative_return: float,
+                    agent_metrics: Dict[str, List]
+                    ):
+        """Logs metrics to a JSON file incrementally with buffering."""
 
-            # Convert any non-serializable input in kwargs to a serializable format
-            for key, value in kwargs.items():
-                if isinstance(value, np.ndarray):
-                    kwargs[key] = value.tolist()
-                elif not isinstance(value, (int, float, str, bool, list, dict, type(None))):
-                    kwargs[key] = str(value)  # Convert non-serializable types to string
+        metrics = {
+            "repeat": repeat,
+            "episode": episode,
+            "actions": actions,
+            "collusive_action_frequency": action_frequencies,
+            "joint_action_frequencies": joint_action_frequencies,
+            "rewards": rewards,
+            "cumulative_return": cumulative_return,
+            "agent_metrics": agent_metrics
+        }
 
-            metrics = {
-                "repeat": repeat,
-                "episode": episode,
-                "actions": actions,
-                "rewards": rewards,
-                "collusive action frequency": action_frequencies,
-                "joint action frequencies": joint_action_frequencies,
-                "metrics": kwargs
-            }
+        # Add metrics to buffer
+        self.metrics_buffer.append(metrics)
 
-            # Add metrics to buffer
-            self.metrics_buffer.append(metrics)
-
-            # Write buffer to file every `log_interval` steps
-            if (episode + 1) % self.log_interval == 0 or episode == repeat - 1:
-                with open(self.metrics_filename, mode='r+') as file:
-                    try:
-                        data = json.load(file)
-                        if not isinstance(data, dict) or "training" not in data or "evaluation" not in data:
-                            data = {"training": [], "evaluation": []}
-                    except json.JSONDecodeError:
-                        data = {"training": [], "evaluation": []}
-
-                    if mode == "training":
-                        data["training"].extend(self.metrics_buffer)
-                    elif mode == "evaluation":
-                        data["evaluation"].extend(self.metrics_buffer)
-                    else:
-                        raise ValueError("Mode must be 'training' or 'evaluation'")
-
-                    # Write updated data back to file
-                    file.seek(0)
-                    json.dump(data, file, indent=4)
-                    file.truncate()
-
-                # Clear the buffer after writing
-                self.metrics_buffer = []
+        # Write the entire buffer to file
+        if (episode + 1) == self.num_episodes:
+            with open(self.metrics_filename, 'w') as file:
+                json.dump(self.metrics_buffer, file, indent=4)
 
     @staticmethod
     def _flatten_state(state_dict):
@@ -140,7 +112,7 @@ class Trainer(MPMGEnv):
         for repeat in tqdm(range(self.num_repeats)):
             self.logger.info("Repeat %s", repeat)
 
-            repeat_seed = self.config['common']['seed'] + repeat
+            repeat_seed = self.seed + repeat
             self._set_seed(repeat_seed)
 
             # Initializing agents
@@ -157,6 +129,7 @@ class Trainer(MPMGEnv):
 
             # Training
             self.logger.info("Training")
+            cumulative_return = 0.0
             for episode in range(self.num_episodes):
                 self.logger.info("Episode %s", episode)
 
@@ -174,7 +147,7 @@ class Trainer(MPMGEnv):
                     agent.remember(state, actions, rewards, next_state, True)
                     agent.learn()
 
-                    # Aggregate agent specific metrics
+                    # Agent specific metrics
                     agent_metrics = agent.get_metrics()
                     for key, value in agent_metrics.items():
                         if key not in aggregated_metrics:
@@ -185,40 +158,14 @@ class Trainer(MPMGEnv):
                 action_frequencies = self.action_frequencies.tolist()
                 joint_action_frequencies = self.joint_action_frequencies.tolist()
                 rewards = rewards.tolist()
-                self._log_metrics(mode='training', 
-                                  repeat=repeat, 
+                cumulative_return += sum(rewards)
+                self._log_metrics(repeat=repeat, 
                                   episode=episode, 
                                   actions=actions, 
                                   rewards=rewards,
                                   action_frequencies=action_frequencies,
                                   joint_action_frequencies=joint_action_frequencies,
-                                  metrics=aggregated_metrics)
-            
-            # Evaluation
-            self.logger.info("Evaluation")
-            cumulative_returns = 0.0
-            state_dict = self.reset(seed=repeat_seed)
-            state = self._flatten_state(state_dict)
-            for eval_episode in range(self.num_eval_episodes):
-                actions = [agent.act(state, exploit=True) for agent in self.agents]
-                rewards, next_state_dict, _ = self.step(actions)
-                
-                # Next state
-                state_dict = next_state_dict
-                state = self._flatten_state(state_dict)
-
-                # Track metrics
-                cumulative_returns += sum(rewards)
-                action_frequencies = self.action_frequencies.tolist()
-                joint_action_frequencies = self.joint_action_frequencies.tolist()
-                rewards = rewards.tolist()
-                self._log_metrics(mode='evaluation', 
-                                  repeat=repeat, 
-                                  episode=eval_episode, 
-                                  actions=actions, 
-                                  rewards=rewards,
-                                  action_frequencies=action_frequencies,
-                                  joint_action_frequencies=joint_action_frequencies,
-                                  metrics={"cumulative return": cumulative_returns})
+                                  cumulative_return=cumulative_return,
+                                  agent_metrics=aggregated_metrics)
 
         self.logger.info("End of the experiment")

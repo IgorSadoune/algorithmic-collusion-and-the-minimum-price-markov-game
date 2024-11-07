@@ -165,8 +165,9 @@ class D3QNOMAgent(OpponentModel):
         loss = self.criterion(_values, target_q_values)
 
         self.loss = loss.item()
-        self.q_value_0 = q_values.detach()[0,0].item()
-        self.q_value_1 = q_values.detach()[0,1].item()
+        q_value_0 = q_values.detach()[0,0].item()
+        q_value_1 = q_values.detach()[0,1].item()
+        self.q_values = [q_value_0, q_value_1]
 
         # Underflow
         if loss == None:
@@ -189,6 +190,5 @@ class D3QNOMAgent(OpponentModel):
 
     def get_metrics(self) -> Dict[str, float]:
         metrics_dict = {"loss": self.loss,
-                        "q-value defect": self.q_value_0,
-                        "q-value cooperate": self.q_value_1}
+                        "q_values": self.q_values}
         return metrics_dict

@@ -3,9 +3,7 @@
 common:
   num_repeats: 100
   num_episodes: 100
-  num_eval_episodes: 100
   seed: 42
-  log_interval: 1
   logs_path: "logs/"
   metrics_path: "metrics/"
   plots_path: "plots/"

@@ -16,7 +16,7 @@ class UCBAgent:
         self.agent_id = agent_id
         self.n_arms = action_dim
         self.C = config['UCB']['C']
-
+        self.cumulative_regret = 0.0
         self.counts = np.ones(self.n_arms)
         self.values = np.zeros(self.n_arms)
         self.memory = []
@@ -46,12 +46,9 @@ class UCBAgent:
         
         # Regret
         optimal_reward = max(self.values)
-        self.regret = float(optimal_reward - reward)
+        self.cumulative_regret += float(optimal_reward - reward)
         self.values[self.chosen_arm] = new_value
-        self.action_value = self.values[1]
 
     def get_metrics(self) -> Dict[str, float]:
-        metrics_dict = {"regret": self.regret,
-                        "action value for cooperation": self.action_value
-                        }
+        metrics_dict = {"cumulative_regret": self.cumulative_regret}
         return metrics_dict
