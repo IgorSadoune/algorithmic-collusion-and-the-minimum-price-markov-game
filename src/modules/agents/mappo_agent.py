@@ -108,8 +108,10 @@ class MAPPOAgent:
         probs = torch.softmax(logits, dim=-1)
         old_log_probs = log_probs.gather(1, actions.unsqueeze(-1)).squeeze(-1).detach()
         new_log_probs = log_probs.gather(1, actions.unsqueeze(-1)).squeeze(-1)
-
-        self.probs = probs[0,1].item()
+        
+        probs_0 = probs[0,0].item()
+        probs_1 = probs[0,1].item()
+        self.probs = [probs_0, probs_1]
 
         ratio = torch.exp(new_log_probs - old_log_probs)
         surr1 = ratio * advantages
@@ -138,5 +140,5 @@ class MAPPOAgent:
     def get_metrics(self) -> Dict[str, float]:
         metrics_dict = {"actor_loss": self.actor_loss,
                         "critic_loss": self.critic_loss,
-                        "cooperation_policy": self.probs}
+                        "policies": self.probs}
         return metrics_dict
