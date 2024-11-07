@@ -131,7 +131,7 @@ run_all.bat
 This command will also produce all the figures present in the study. The figures will be saved under the `src/plots/` directory.
 
 ## Computational Considerations (with default hyperparamters) 
-There are a total of 24 experiments as each of the 6 agent classes used in the paper are tested on 4 configurations of the MPMG. Each experiment comprises 100 replications of 100 training episodes and 100 evaluation episodes, for a total of 60,000 training iterations and 60,000 iterations with no parameter update. 
+There are 24 experiments as each of the 6 agent classes used in the paper are tested on 4 configurations of the MPMG. Among the 24 experiments, 12 are conducted on the 2-player MPMG and 12 on the 5-player MPMG, that is, 84 agents are trained over 100 replications of 100 training episodes, for a total 840,000 training iterations. 
 
 ## Hyperparameter Configuration
 Default configuration is stored in `src/config.yaml`, where the file can be accessed and modified. 
@@ -154,12 +154,12 @@ for Windows users.
 
 ## Experiment Parameter Description
 - **`--num_agents`**: Specifies the number of agents (e.g., `5`). Note that increasing the number of agents may significantly increase computation time.
-- **`--sigma_beta`**: Controls the level of agent heterogeneity, with values ranging between `0` and `0.5`. A higher value implies greater heterogeneity among agents.
+- **`--sigma_beta`**: Controls the level of agent heterogeneity, with values ranging between `0.0` and `0.5`. A higher value implies greater heterogeneity among agents.
 - **`--agent_name`**: Specifies the type of agent to be used. Options include:
   - `"mappo"`: MAPPO agents
   - `"d3qn"`: Dueling Double Deep Q-network agents
-  - `"d3qn_om"`: Dueling Double Deep Q-network with Opponent Modeling agents
-  - `"e_greedy"`: Epsilon Greedy agents
+  - `"d3qnom"`: Dueling Double Deep Q-network with Opponent Modeling agents
+  - `"eg"`: Epsilon Greedy agents
   - `"ts"`: Thompson Sampling agents
   - `"ucb"`: Upper Confidence Bound agents
 
@@ -167,15 +167,15 @@ for Windows users.
 If not existing, the `logs/` and `metrics/` directories will be created automatically upon execution of at least one experiment. Each experiment is associated with a `.log` file in the `logs/` directory for debugging support. The file naming convention follows:
 
 ```
-mappo_5_05_log.log
+mappo_5_0.5_log.log
 ```
 
-where `"mappo"` indicates the agent class, `"5"` represents the number of agents (the value used for `--num_agents`), and `"05"` refers to the value `0.5` for the level of heterogeneity. 
+where `"mappo"` indicates the agent class, `"5"` represents the number of agents (the value used for `--num_agents`), and `"0.5"` refers to the value `0.5` for the level of heterogeneity. 
 
 Similarly, JSON files storing the various training and evaluation metrics will be created upon execution of the experiments under the `metrics/` directory, using a similar naming convention:
 
 ```
-mappo_5_05_metrics.json
+mappo_5_0.5_metrics.json
 ```
 
 If a `.log` or `.json` file already exists before the execution of its associated experiment, it will be replaced if the experiment is executed again. When all experiments are executed at once, all the corresponding `.log` and `.json` files are created.
