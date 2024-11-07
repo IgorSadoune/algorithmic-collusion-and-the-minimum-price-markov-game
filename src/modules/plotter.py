@@ -41,9 +41,14 @@ class HarryPlotter:
             
             # Agent metrics - dynamically handle all keys and take the average across agents
             for key, values in item['agent_metrics'].items():
-                if key not in agent_metrics:
+                if key == 'q_values':
+                    agent_metrics[key] = np.zeros((self.num_repeats, self.num_episodes, 2))
+                elif key not in agent_metrics:
                     agent_metrics[key] = np.zeros((self.num_repeats, self.num_episodes))
-                agent_metrics[key][repeat, episode] = np.mean(values)
+                if key not in 'q_values':    
+                    agent_metrics[key][repeat, episode] = np.mean(values)
+                else:
+                    agent_metrics[key][repeat, episode] = np.mean(values, axis=0)
         
         self.metrics = {'joint_action_frequencies': joint_action_frequencies,
                    'agent_metrics': agent_metrics}
@@ -52,7 +57,7 @@ class HarryPlotter:
         if ylabel is None:
             ylabel = " ".join(metric_name.split('_')).title()
 
-        plt.style.use('ggplot')
+        plt.style.use('classic')
         plt.figure(figsize=(5, 5))
 
         # Average across repeats
@@ -61,16 +66,34 @@ class HarryPlotter:
         x_values = np.arange(self.num_episodes)
 
         if metric_name == 'joint_action_frequencies':
-            plt.plot(x_values, avg_metric[:, 0])
-            plt.fill_between(x_values, avg_metric[:, 0] - std_metric[:, 0], avg_metric[:, 0] + std_metric[:, 0], alpha=0.1)
-            plt.plot(x_values, avg_metric[:, -1])
-            plt.fill_between(x_values, avg_metric[:, -1] - std_metric[:, -1], avg_metric[:, -1] + std_metric[:, -1], alpha=0.1)
+            plt.plot(x_values, avg_metric[:, 0], linestyle = '-', marker = 's', color='black')
+            plt.fill_between(x_values, avg_metric[:, 0] - std_metric[:, 0], avg_metric[:, 0] + std_metric[:, 0], alpha=0.2, color='dimgrey')
+            plt.plot(x_values, avg_metric[:, -1], linestyle = '-', marker = 'o', color='black')
+            plt.fill_between(x_values, avg_metric[:, -1] - std_metric[:, -1], avg_metric[:, -1] + std_metric[:, -1], alpha=0.2, color='dimgrey')
+            plt.ylabel(ylabel)
+        elif metric_name == 'q_values':
+            plt.plot(x_values, avg_metric[:, 0], linestyle = '-', marker = 'v', color='black')
+            plt.fill_between(x_values, avg_metric[:, 0] - std_metric[:, 0], avg_metric[:, 0] + std_metric[:, 0], alpha=0.2, color='dimgrey')
+            plt.plot(x_values, avg_metric[:, 1], linestyle = '-', marker = '^', color='black')
+            plt.fill_between(x_values, avg_metric[:, 1] - std_metric[:, 1], avg_metric[:, 1] + std_metric[:, 1], alpha=0.2, color='dimgrey')
+            plt.ylabel(f'Agents Average {ylabel}')
         else:
-            plt.plot(x_values, avg_metric, color='darkgrey')
-            plt.fill_between(x_values, avg_metric - std_metric, avg_metric + std_metric, alpha=0.1, color='dimgrey')
+            plt.plot(x_values, avg_metric, color='black')
+            plt.fill_between(x_values, avg_metric - std_metric, avg_metric + std_metric, alpha=0.2, color='dimgrey')
+            plt.ylabel(f'Agents Average {ylabel}')
 
         plt.xlabel(xlabel)
-        plt.ylabel(ylabel)
+
+        if metric_name == 'cumulative_regret':
+            plt.ylim(-0.3, 0.1)
+        elif metric_name in ['cooperation_policy', 'loss', 'joint_action_frequencies']:
+            plt.ylim(0,1)
+        elif metric_name == 'q_values':
+            plt.ylim(0,0.5)
+        elif metric_name == 'actor_loss':
+            plt.ylim(-0.3, 0.2)
+        else: # critic_loss
+            plt.ylim(0,0.75)    
 
         # Constructing filename from input JSON
         base_filename = re.sub(r'(_metrics|\.json)', '', os.path.basename(self.metrics_path))
