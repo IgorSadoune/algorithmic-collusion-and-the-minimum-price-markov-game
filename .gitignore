@@ -1,6 +1,6 @@
 logs/
 plots/
 metrics/
-venv/
+env_paper2/
 test/
 **/__pycache__/
