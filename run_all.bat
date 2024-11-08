@@ -18,5 +18,7 @@ for %%a in (%AGENTS%) do (
 
 echo Plotting training and evaluation metrics
 python src\scripts\plot.py --file "all"
+echo Plotting heatmap
+python src/scripts/heatmap.py
 
 endlocal

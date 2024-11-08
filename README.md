@@ -187,6 +187,12 @@ To produce the figures associated to a specific configuration, use for instance
 python src/scripts/plot.py --file "mappo_5_0.5_metrics.json"
 ```
 
+The heatmap is produced and saved ubnder `src/plots/` upon execution of `run_all.sh` or `run_all.bat`, but for producing it as a standalone, all the 24 `_metrics.json` files must exist in `src/metrics/`. In this case, use
+
+```sh
+python src/scripts/heatmap.py
+```
+
 # License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
