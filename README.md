@@ -45,10 +45,12 @@ src/                            # Source directory
 │   │   ├── ts_agent.py         # Thompson Sampling bandit
 │   │   └── ucb_agent.py        # Upper Confidence Bound bandit
 │   ├── mpmg.py                 # Minimum Price Markov Game environment
+|   ├── convergence_rates.py    # Module to extract, store and use convergence rates 
 │   ├── trainer.py              # General trainer class
 |   ├── plotter.py              # Plotting module
 │   └── utils.py                # Utility methods
 └── scripts/                    # Scripts directory
+    ├── heatmap.py              # Heatmap control script
     ├── plot.py                 # Plotting control script
     └── main.py                 # Experiment control script
 ```
@@ -66,9 +68,11 @@ src/                            # Source directory
 
 (Via command line)
 
-## Clone the Repository
+## Download or Clone the Repository
 
 `git clone https://github.com/IgorSadoune/Algorithmic-Collusion-and-the-Minimum-Price-Markov-Game.git`
+
+or manual download via https://github.com/IgorSadoune/Algorithmic-Collusion-and-the-Minimum-Price-Markov-Game.git.
 
 ## Virtual Environment (optional but recommended)
 
