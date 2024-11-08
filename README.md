@@ -135,7 +135,7 @@ run_all.bat
 This command will also produce all the figures present in the study. The figures will be saved under the `src/plots/` directory.
 
 ## Computational Considerations (with default hyperparamters) 
-There are 24 experiments as each of the 6 agent classes used in the paper are tested on 4 configurations of the MPMG. Among the 24 experiments, 12 are conducted on the 2-player MPMG and 12 on the 5-player MPMG, that is, 84 agents are trained over 100 replications of 100 training episodes, for a total 840,000 training iterations. 
+There are 24 experiments as each of the 6 agent classes used in the paper are tested on 4 configurations of the MPMG. Among the 24 experiments, 12 are conducted on the 2-player MPMG and 12 on the 5-player MPMG, that is, 84 agents are trained over 100 replications of 100 training episodes, for a total 840,000 training iterations (optimization always uses stochastic gradient ascent). 
 
 ## Hyperparameter Configuration
 Default configuration is stored in `src/config.yaml`, where the file can be accessed and modified. 

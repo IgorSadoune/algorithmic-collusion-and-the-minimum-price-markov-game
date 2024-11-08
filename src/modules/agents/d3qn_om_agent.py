@@ -101,7 +101,6 @@ class D3QNOMAgent(OpponentModel):
         self.epsilon_decay = config['D3QN']['epsilon_decay']  
         self.epsilon_min = config['D3QN']['epsilon_min'] 
         self.buffer_size = config['D3QN']['buffer_size']
-        self.batch_size = config['D3QN']['batch_size']
 
         self.device = device
         self.value_stream_hidden_dims = config['D3QN']['value_stream_hidden_dims']
@@ -138,11 +137,10 @@ class D3QNOMAgent(OpponentModel):
 
         self.counter += 1
 
-        if len(self.memory) < self.batch_size:
+        if len(self.memory) < 1:
             return
 
-        minibatch = random.sample(self.memory, self.batch_size)
-        states, actions_, rewards_, next_states, dones = zip(*minibatch)
+        states, actions_, rewards_, next_states, dones = zip(*self.memory)
         
         opponent_actions = np.array(actions_)
         opponent_actions = np.delete(opponent_actions, self.agent_id, axis=1)
