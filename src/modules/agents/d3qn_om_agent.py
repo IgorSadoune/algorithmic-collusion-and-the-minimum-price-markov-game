@@ -100,7 +100,6 @@ class D3QNOMAgent(OpponentModel):
         self.epsilon = config['D3QN']['epsilon'] 
         self.epsilon_decay = config['D3QN']['epsilon_decay']  
         self.epsilon_min = config['D3QN']['epsilon_min'] 
-        self.buffer_size = config['D3QN']['buffer_size']
 
         self.device = device
         self.value_stream_hidden_dims = config['D3QN']['value_stream_hidden_dims']
@@ -111,7 +110,7 @@ class D3QNOMAgent(OpponentModel):
         self.optimizer = torch.optim.Adam(self.q_network.parameters(), lr=self.lr)
         self.criterion = torch.nn.MSELoss()
 
-        self.memory = deque(maxlen=self.buffer_size)
+        self.memory = []
 
         self.counter = 0
 
@@ -130,27 +129,25 @@ class D3QNOMAgent(OpponentModel):
         q_values = q_values * opponent_action_values
         return torch.argmax(q_values).item()
 
-    def remember(self, state: np.ndarray, actions: List[bool], rewards: List[float], next_state: np.ndarray, dones: bool):
-        self.memory.append((state, actions, rewards, next_state, dones))
+    def remember(self, state: np.ndarray, actions: List[bool], rewards: List[float], next_state: np.ndarray, done: bool):
+        self.memory.append((state, actions, rewards, next_state, done))
 
     def learn(self):
 
         self.counter += 1
 
-        if len(self.memory) < 1:
-            return
-
-        states, actions_, rewards_, next_states, dones = zip(*self.memory)
+        state, actions, rewards, next_state, done = zip(*self.memory)
+        self.memory = []
         
-        opponent_actions = np.array(actions_)
+        opponent_actions = np.array(actions)
         opponent_actions = np.delete(opponent_actions, self.agent_id, axis=1)
         opponent_actions = torch.LongTensor(opponent_actions).to(self.device)
 
-        states = torch.FloatTensor(np.array(states)).to(self.device)
-        actions = torch.LongTensor(np.array(actions_)[:, self.agent_id]).to(self.device)
-        rewards = torch.FloatTensor(np.array(rewards_)[:, self.agent_id]).to(self.device)
-        next_states = torch.FloatTensor(np.array(next_states)).to(self.device)
-        dones = torch.FloatTensor(np.array(dones)).to(self.device)
+        states = torch.FloatTensor(np.array(state)).to(self.device)
+        actions = torch.LongTensor(np.array(actions)[:, self.agent_id]).to(self.device)
+        rewards = torch.FloatTensor(np.array(rewards)[:, self.agent_id]).to(self.device)
+        next_states = torch.FloatTensor(np.array(next_state)).to(self.device)
+        dones = torch.FloatTensor(np.array(done)).to(self.device)
 
         actions = actions.view(-1, 1)
 

@@ -25,7 +25,6 @@ D3QN:
   epsilon: 1.0
   epsilon_decay: 0.995
   epsilon_min: 0.01
-  buffer_size: 10000
 
 Epsilon Greedy:
     epsilon: 0.3

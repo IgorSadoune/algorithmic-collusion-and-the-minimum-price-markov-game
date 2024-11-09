@@ -78,32 +78,30 @@ class MAPPOAgent:
             action = torch.argmax(probs).item()
         return action
 
-    def remember(self, state: np.ndarray, actions: List[bool], rewards: List[float], next_state: np.ndarray, dones: bool):
-        self.memory.append((state, actions, rewards, next_state, dones))
+    def remember(self, state: np.ndarray, actions: List[bool], rewards: List[float], next_state: np.ndarray, done: bool):
+        self.memory.append((state, actions, rewards, next_state, done))
 
     def learn(self):
-        if len(self.memory) == 0:
-            return None, None
 
-        states, actions_, rewards_, next_states, dones = zip(*self.memory)
+        state, actions, rewards, next_state, done = zip(*self.memory)
         self.memory = []
         
-        states = torch.FloatTensor(np.array(states)).to(self.device)
-        actions = torch.LongTensor(np.array(actions_)[:, self.agent_id]).to(self.device)
-        rewards = torch.FloatTensor(np.array(rewards_)[:, self.agent_id]).to(self.device)
-        next_states = torch.FloatTensor(np.array(next_states)).to(self.device)
-        dones = torch.FloatTensor(np.array(dones)).to(self.device)
+        state = torch.FloatTensor(np.array(state)).to(self.device)
+        actions = torch.LongTensor(np.array(actions)[:, self.agent_id]).to(self.device)
+        rewards = torch.FloatTensor(np.array(rewards)[:, self.agent_id]).to(self.device)
+        next_state = torch.FloatTensor(np.array(next_state)).to(self.device)
+        done = torch.FloatTensor(np.array(done)).to(self.device)
 
         # Compute values and advantages
-        values = self.critic(states)
-        next_values = self.critic(next_states).detach()
-        returns = self._compute_gae(next_values[-1], rewards, 1 - dones, values)
+        values = self.critic(state)
+        next_values = self.critic(next_state).detach()
+        returns = self._compute_gae(next_values[-1], rewards, 1 - done, values)
 
         returns = torch.cat(returns).detach()
         advantages = returns - values
 
         # Update actor
-        logits = self.actor(states)
+        logits = self.actor(state)
         log_probs = torch.functional.F.log_softmax(logits, dim=-1)
         probs = torch.softmax(logits, dim=-1)
         old_log_probs = log_probs.gather(1, actions.unsqueeze(-1)).squeeze(-1).detach()
