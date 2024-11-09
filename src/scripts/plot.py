@@ -25,7 +25,7 @@ metrics_directory = "src/metrics/"
 if args.file == 'all':
     # Loop over all JSON files in the metrics directory
     for filename in os.listdir(metrics_directory):
-        if filename.endswith('.json'):
+        if filename.endswith('.json') and not "convergence_rates.json":
             metrics_path = os.path.join(metrics_directory, filename)
             plotter = HarryPlotter(config=config, metrics_path=metrics_path)
             plotter.plot_all_metrics()
