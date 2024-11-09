@@ -60,9 +60,9 @@ class HarryPlotter:
 
         # Constructing filename from input JSON
         experiment_id = re.sub(r'(_metrics|\.json)', '', os.path.basename(self.metrics_path))
-        plot_filename = f'{experiment_id}_{metric_name}_plot.png'
-        agent_directory = re.match(r'([^_]+)_', plot_filename).group(1)
-        plot_directory = os.path.join(self.plots_path, agent_directory)
+        plot_filename = f'{metric_name}_{experiment_id}_plot.png'
+        metric_directory = metric_name
+        plot_directory = os.path.join(self.plots_path, metric_directory)
 
         plt.style.use('classic')
         plt.figure(figsize=(5, 5))
