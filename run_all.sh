@@ -15,6 +15,5 @@ for agent in "${AGENTS[@]}"; do
 done
 
 # Plot all figures
-echo "Plotting training and evaluation metrics"
-python3 src/scripts/plot.py --file "all"
-python3 src/scripts/heatmap.py
+echo "Plotting metrics and heatmap"
+python3 src/scripts/plot.py
