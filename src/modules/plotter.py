@@ -15,9 +15,11 @@ class Plotter:
         self.metrics_dir = os.path.join(root, config['common']['metrics_path'])
         self.plot_dir = os.path.join(root, config['common']['plots_path'])
         self.convergence_scores_path = os.path.join(self.metrics_dir, 'convergence_scores.json')
+        self.average_last_jaf_path = os.path.join(self.metrics_dir, 'average_last_jaf.json')
         self.num_repeats = config['common']['num_repeats']
         self.num_episodes = config['common']['num_episodes']
         self.convergence_scores = {}
+        self.average_last_jaf = {}
 
     def _extract_metrics(self, filename: str) -> None:
 
@@ -65,6 +67,10 @@ class Plotter:
             return float(score)
         
         average_last_jaf = np.mean(self.metrics['joint_action_frequencies'], axis=0)[self.num_episodes-1]
+        self.average_last_jaf[self.experiment_id] = {'defect':average_last_jaf[0],
+                                                    'cooperate': average_last_jaf[-1],
+                                                    'other': 1. - (average_last_jaf[-1] + average_last_jaf[0])
+                                                    }
         score = compute_convergence_score(average_last_jaf)
         self.convergence_scores[self.experiment_id] = score
 
@@ -79,6 +85,8 @@ class Plotter:
     def _store_convergence_scores(self) -> None:
         with open(self.convergence_scores_path, 'w') as f:
             json.dump(self.convergence_scores, f, indent=4)
+        with open(self.average_last_jaf_path, 'w') as f:
+            json.dump(self.average_last_jaf, f, indent=4)
 
     def _plot_metric(self, metric_data: List[float], metric_name: str) -> None:
 
@@ -223,7 +231,7 @@ class Plotter:
     
     def main(self) -> None:
         for filename in os.listdir(self.metrics_dir):
-            if not filename in ['convergence_scores.json']:
+            if not filename in ['convergence_scores.json', 'average_last_jaf.json']:
                 self._extract_metrics(filename)
                 self._get_convergence_scores()
                 self._plot_metric(self.metrics['joint_action_frequencies'], 'joint_action_frequencies')
