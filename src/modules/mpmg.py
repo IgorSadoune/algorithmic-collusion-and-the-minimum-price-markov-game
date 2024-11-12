@@ -128,24 +128,6 @@ class MPMGEnv(object):
         self._get_state()
 
         return self.state_space
-
-    def reset(self, seed: Optional[int] = None) -> Dict[str, np.ndarray]:
-        '''
-        Reset env with unbiased frequencies. Returns initial state.
-        '''
-        self._set_seed(seed)
-        self._get_power_parameters()
-        self.iteration = 1 # not 0 because it's a counter
-        self.action_counts = np.zeros(self.n_agents)
-        self.joint_action_counts = np.zeros(self.joint_action_size)
-
-        # Initialize state with unbiased frequencies (plays each joint-action exactly once)
-        joint_actions = list(itertools.product(range(self.action_size), repeat=self.n_agents))
-        for actions in joint_actions:
-            _, __, ___ = self.step(actions)
-        self._get_state()
-
-        return self.state_space
     
     def step(self, actions: List[int]) -> Tuple[np.ndarray, dict, bool]:
         '''
