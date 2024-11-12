@@ -154,25 +154,21 @@ class Plotter:
     def _plot_heatmap(self):
        # Use the sorted list of configurations from Nash-heavy to Pareto-heavy
         configs = ['ts_2_0.0',
-                    'ts_2_0.5',
                     'eg_2_0.0',
                     'eg_2_0.5',
+                    'ts_2_0.5',
                     'mappo_2_0.0',
                     'mappo_2_0.5',
                     'ts_5_0.0',
-                    'ts_5_0.5',
                     'eg_5_0.0',
-                    'mappo_5_0.0',
                     'eg_5_0.5',
-                    'mappo_5_0.5',
+                    'ts_5_0.5',
+                    'mappo_5_0.0',
                     'd3qn_2_0.0',
-                    'd3qnom_2_0.0',
                     'd3qn_2_0.5',
-                    'd3qnom_2_0.5',
+                    'mappo_5_0.5',
                     'ucb_5_0.5',
-                    'd3qnom_5_0.5',
                     'd3qn_5_0.5',
-                    'd3qnom_5_0.0',
                     'd3qn_5_0.0',
                     'ucb_5_0.0',
                     'ucb_2_0.5',
@@ -220,8 +216,8 @@ class Plotter:
         )
 
         # Add labels "Nash" and "Pareto" at the ends of the heatmap
-        plt.text(-0.5, 0, 'Nash', fontsize=10, weight='bold', color='#87CEFA', ha='center')
-        plt.text(len(configs) + 0.5, 0, 'Pareto', fontsize=10, weight='bold', color='#ffd1dc', ha='center')
+        plt.text(-0.5, 0, 'Nash', fontsize=10, weight='bold', color='black', ha='center')
+        plt.text(len(configs) + 0.5, 0, 'Pareto', fontsize=10, weight='bold', color='black', ha='center')
 
         # Customize the appearance of axis labels and ticks
         plt.xticks(rotation=45, ha='right', fontsize=8)  # Diagonal labels for better readability

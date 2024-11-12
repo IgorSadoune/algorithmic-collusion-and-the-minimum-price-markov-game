@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Run experiments with all configurations
-declare -a AGENTS=("mappo" "d3qn" "d3qnom" "eg" "ts" "ucb")
+declare -a AGENTS=("mappo" "d3qn" "eg" "ts" "ucb")
 declare -a NUM_AGENTS=(2 5)
 declare -a SIGMA_BETA=(0.0 0.5)
 

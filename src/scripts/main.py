@@ -11,7 +11,6 @@ from modules.trainer import Trainer
 from modules.utils import restricted_float
 from modules.agents.mappo_agent import MAPPOAgent
 from modules.agents.d3qn_agent import D3QNAgent
-from modules.agents.d3qn_om_agent import D3QNOMAgent
 from modules.agents.eg_agent import EpsilonGreedyAgent
 from modules.agents.ts_agent import ThompsonSamplingAgent
 from modules.agents.ucb_agent import UCBAgent
@@ -36,7 +35,6 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 agent_dict = {
     'mappo': MAPPOAgent,
     'd3qn': D3QNAgent,
-    'd3qnom': D3QNOMAgent,
     'eg': EpsilonGreedyAgent,
     'ts': ThompsonSamplingAgent,
     'ucb': UCBAgent

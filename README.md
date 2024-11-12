@@ -155,7 +155,6 @@ for Windows users.
 - **`--agent_name`**: Specifies the type of agent to be used. Options include:
   - `"mappo"`: MAPPO agents
   - `"d3qn"`: Dueling Double Deep Q-network agents
-  - `"d3qnom"`: Dueling Double Deep Q-network with Opponent Modeling agents
   - `"eg"`: Epsilon Greedy agents
   - `"ts"`: Thompson Sampling agents
   - `"ucb"`: Upper Confidence Bound agents

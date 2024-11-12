@@ -3,7 +3,7 @@
 REM Run experiments with all configurations
 setlocal enableDelayedExpansion
 
-set AGENTS=mappo d3qn d3qnom eg ts ucb
+set AGENTS=mappo d3qn eg ts ucb
 set NUM_AGENTS="2" "5"
 set SIGMA_BETA="0.0" "0.5"
 
