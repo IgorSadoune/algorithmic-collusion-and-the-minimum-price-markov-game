@@ -1,8 +1,8 @@
 #src/config.yaml
 
 common:
-  num_repeats: 100
-  num_episodes: 100
+  num_repeats: 100 # MUST BE 2 MINIMUM
+  num_episodes: 100 # MUST BE 2 MINIMUM
   seed: 42
   logs_path: "logs/"
   metrics_path: "metrics/"
