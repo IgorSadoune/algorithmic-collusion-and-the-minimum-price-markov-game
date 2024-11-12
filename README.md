@@ -38,7 +38,6 @@ src/                            # Source directory
 │   ├── agents/                 # MARL agents
 │   │   ├── mappo_agent.py      # Multi-Agent Proximal Policy Optimization
 │   │   ├── d3qn_agent.py       # Double Deep Q-network
-│   │   ├── d3qn_om_agent.py    # Double Deep Q-network with opponent modeling
 │   │   ├── eg_agent.py         # Epsilon Greedy bandit
 │   │   ├── ts_agent.py         # Thompson Sampling bandit
 │   │   └── ucb_agent.py        # Upper Confidence Bound bandit
